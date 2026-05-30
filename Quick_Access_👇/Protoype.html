@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VTU Internship Report — Manjunath V Poojari</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --surface: #111520;
+    --card: #161c2a;
+    --border: #1f2a3f;
+    --accent: #f5a623;
+    --accent2: #4fc3f7;
+    --accent3: #81c784;
+    --text: #e8edf5;
+    --muted: #6b7a96;
+    --phase1: #7c4dff;
+    --phase2: #00b0ff;
+    --phase3: #00e676;
+    --april: #ff6d00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: .4;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem 4rem;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,166,35,.12) 0%, transparent 70%);
+    top: -200px; left: -200px;
+    animation: pulse 8s ease-in-out infinite;
+  }
+  .hero-glow2 {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79,195,247,.08) 0%, transparent 70%);
+    bottom: -100px; right: -100px;
+    animation: pulse 10s ease-in-out 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: .7; }
+  }
+
+  .hero-content { position: relative; z-index: 1; text-align: center; max-width: 900px; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(245,166,35,.1);
+    border: 1px solid rgba(245,166,35,.3);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: .35rem 1rem;
+    border-radius: 100px;
+    margin-bottom: 2rem;
+    animation: fadeUp .8s ease forwards;
+  }
+
+  .hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    animation: fadeUp .8s .15s ease both;
+  }
+
+  .hero-name span { color: var(--accent); font-style: italic; }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 2.5rem;
+    animation: fadeUp .8s .3s ease both;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem 2rem;
+    animation: fadeUp .8s .45s ease both;
+  }
+
+  .meta-pill {
+    display: flex; align-items: center; gap: .5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: .5rem 1.1rem;
+    border-radius: 8px;
+    font-size: .85rem;
+  }
+
+  .meta-pill .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 8px var(--accent3);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(10,13,18,.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .85rem;
+    color: var(--accent);
+    letter-spacing: .05em;
+  }
+
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: .85rem;
+    font-weight: 500;
+    letter-spacing: .05em;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ── SECTIONS ── */
+  section { position: relative; z-index: 1; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+  .section-header {
+    display: flex; align-items: center; gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(245,166,35,.08);
+    border: 1px solid rgba(245,166,35,.2);
+    padding: .3rem .8rem;
+    border-radius: 4px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+  }
+
+  /* ── STATS ── */
+  .stats-section {
+    padding: 5rem 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2rem;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-radius: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    transition: transform .3s, border-color .3s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245,166,35,.4);
+  }
+
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+    margin-bottom: .5rem;
+  }
+
+  .stat-label {
+    font-size: .8rem;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  /* ── PHASES ── */
+  .phases-section { padding: 6rem 0; }
+
+  .phases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .phase-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform .3s;
+  }
+
+  .phase-card:hover { transform: translateY(-6px); }
+
+  .phase-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .phase-card.p1::before { background: linear-gradient(90deg, var(--phase1), #b39ddb); }
+  .phase-card.p2::before { background: linear-gradient(90deg, var(--phase2), #80d8ff); }
+  .phase-card.p3::before { background: linear-gradient(90deg, var(--phase3), #b9f6ca); }
+  .phase-card.pa::before { background: linear-gradient(90deg, var(--april), #ffcc02); }
+
+  .phase-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: .75rem;
+  }
+
+  .phase-card.p1 .phase-num { color: var(--phase1); }
+  .phase-card.p2 .phase-num { color: var(--phase2); }
+  .phase-card.p3 .phase-num { color: var(--phase3); }
+  .phase-card.pa .phase-num { color: var(--april); }
+
+  .phase-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: .5rem;
+  }
+
+  .phase-desc {
+    font-size: .875rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+
+  .phase-tags {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+  }
+
+  .tag {
+    font-size: .72rem;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: .2rem .6rem;
+    border-radius: 4px;
+  }
+
+  /* ── SKILLS ── */
+  .skills-section { padding: 6rem 0; background: var(--surface); }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+
+  .skill-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    display: flex; flex-direction: column;
+    align-items: flex-start; gap: .75rem;
+    transition: border-color .2s, transform .2s;
+  }
+
+  .skill-item:hover {
+    border-color: rgba(245,166,35,.35);
+    transform: translateY(-3px);
+  }
+
+  .skill-icon {
+    width: 36px; height: 36px;
+    background: rgba(245,166,35,.1);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  .skill-name {
+    font-size: .85rem;
+    font-weight: 500;
+  }
+
+  .skill-level {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .skill-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  /* ── ACHIEVEMENTS ── */
+  .achievements-section { padding: 6rem 0; }
+
+  .achieve-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .achieve-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    display: flex; gap: 1.25rem;
+    align-items: flex-start;
+    transition: transform .3s;
+  }
+
+  .achieve-card:hover { transform: translateY(-4px); }
+
+  .achieve-badge {
+    min-width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+  }
+
+  .achieve-badge.gold { background: rgba(245,166,35,.15); }
+  .achieve-badge.silver { background: rgba(176,190,197,.15); }
+  .achieve-badge.bronze { background: rgba(205,133,63,.15); }
+
+  .achieve-text h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: .35rem;
+  }
+
+  .achieve-text p {
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline-section { padding: 6rem 0; background: var(--surface); }
+
+  .phase-block { margin-bottom: 4rem; }
+
+  .phase-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .phase-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .phase-dot.p1 { background: var(--phase1); box-shadow: 0 0 10px var(--phase1); }
+  .phase-dot.p2 { background: var(--phase2); box-shadow: 0 0 10px var(--phase2); }
+  .phase-dot.p3 { background: var(--phase3); box-shadow: 0 0 10px var(--phase3); }
+  .phase-dot.pa { background: var(--april); box-shadow: 0 0 10px var(--april); }
+
+  .phase-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .phase-label.p1 { color: var(--phase1); }
+  .phase-label.p2 { color: var(--phase2); }
+  .phase-label.p3 { color: var(--phase3); }
+  .phase-label.pa { color: var(--april); }
+
+  .timeline-entries {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .entry {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: border-color .2s, box-shadow .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .entry::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+
+  .entry.ep1::after { background: var(--phase1); }
+  .entry.ep2::after { background: var(--phase2); }
+  .entry.ep3::after { background: var(--phase3); }
+  .entry.epa::after { background: var(--april); }
+
+  .entry:hover {
+    border-color: rgba(255,255,255,.15);
+    box-shadow: 0 4px 20px rgba(0,0,0,.3);
+  }
+
+  .entry-header {
+    display: flex; align-items: center; gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: .75rem;
+  }
+
+  .entry-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .entry-hrs {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    color: var(--muted);
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    padding: .15rem .5rem;
+    border-radius: 4px;
+  }
+
+  .entry-skills {
+    display: flex; flex-wrap: wrap; gap: .35rem;
+    margin-left: auto;
+  }
+
+  .entry-skills .tag { font-size: .65rem; }
+
+  .entry-summary {
+    font-size: .875rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .entry-outcome {
+    display: none;
+    font-size: .82rem;
+    color: rgba(129,199,132,.9);
+    background: rgba(129,199,132,.06);
+    border: 1px solid rgba(129,199,132,.15);
+    border-radius: 8px;
+    padding: .75rem 1rem;
+    line-height: 1.7;
+    margin-top: .75rem;
+  }
+
+  .entry.open .entry-outcome { display: block; }
+
+  .entry-toggle {
+    font-size: .75rem;
+    color: var(--accent2);
+    display: flex; align-items: center; gap: .4rem;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    user-select: none;
+  }
+
+  .entry-toggle::before {
+    content: '▸';
+    display: inline-block;
+    transition: transform .25s;
+  }
+
+  .entry.open .entry-toggle::before { transform: rotate(90deg); }
+
+  .entry-blocker {
+    display: none;
+    font-size: .78rem;
+    color: rgba(255,110,78,.85);
+    background: rgba(255,110,78,.05);
+    border: 1px solid rgba(255,110,78,.15);
+    border-radius: 6px;
+    padding: .5rem .75rem;
+    margin-top: .5rem;
+  }
+
+  .entry.open .entry-blocker { display: block; }
+
+  /* ── PROJECTS ── */
+  .projects-section { padding: 6rem 0; }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .project-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    transition: transform .3s, border-color .3s;
+  }
+
+  .project-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(79,195,247,.35);
+  }
+
+  .project-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: .75rem;
+  }
+
+  .project-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: .5rem;
+  }
+
+  .project-desc {
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .project-features {
+    display: flex; flex-wrap: wrap; gap: .4rem;
+  }
+
+  .feature-tag {
+    font-size: .68rem;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(79,195,247,.08);
+    border: 1px solid rgba(79,195,247,.15);
+    color: var(--accent2);
+    padding: .18rem .55rem;
+    border-radius: 4px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+
+  footer .footer-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: .5rem;
+  }
+
+  footer p {
+    font-size: .82rem;
+    color: var(--muted);
+  }
+
+  footer .footer-links {
+    display: flex; justify-content: center; gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  footer .footer-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: .05em;
+    transition: color .2s;
+  }
+
+  footer .footer-links a:hover { color: var(--accent); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .container { padding: 0 1.25rem; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: .75rem; }
+    .entry-skills { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">// MVP — Internship 2026</div>
+  <div class="nav-links">
+    <a href="#phases">Phases</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#achievements">Achievements</a>
+    <a href="#timeline">Log</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      VTU Internship Report · Feb – Apr 2026
+    </div>
+    <h1 class="hero-name">Manjunath V <span>Poojari</span></h1>
+    <p class="hero-sub">Flutter Development Intern · Dart · Firebase · Supabase · Android Studio</p>
+    <div class="hero-meta">
+      <div class="meta-pill"><span class="dot"></span> Flutter Mobile Development</div>
+      <div class="meta-pill"><span class="dot" style="background:#4fc3f7;box-shadow:0 0 8px #4fc3f7"></span> Firebase & Supabase Backend</div>
+      <div class="meta-pill"><span class="dot" style="background:#f06292;box-shadow:0 0 8px #f06292"></span> 73 Days · 3 Phases</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-number">73</span>
+        <span class="stat-label">Total Days</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">390+</span>
+        <span class="stat-label">Hours Logged</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">3</span>
+        <span class="stat-label">Learning Phases</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">15+</span>
+        <span class="stat-label">Apps Built</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">5</span>
+        <span class="stat-label">Quizzes — Top 3</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">12</span>
+        <span class="stat-label">O'Reilly Chapters</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASES -->
+<section id="phases" class="phases-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">02 — Overview</span>
+      <h2 class="section-title">Learning Phases</h2>
+    </div>
+    <div class="phases-grid">
+      <div class="phase-card p1">
+        <div class="phase-num">Phase 1 · Feb 2026</div>
+        <h3 class="phase-title">Foundations & Dart</h3>
+        <p class="phase-desc">Dart fundamentals, Flutter setup, widget architecture, OOP principles, stateful & stateless widgets, basic UI construction and interaction handling.</p>
+        <div class="phase-tags">
+          <span class="tag">Dart</span>
+          <span class="tag">Flutter Basics</span>
+          <span class="tag">Widgets</span>
+          <span class="tag">OOP</span>
+          <span class="tag">State Management</span>
+        </div>
+      </div>
+      <div class="phase-card p2">
+        <div class="phase-num">Phase 2 · Feb–Mar 2026</div>
+        <h3 class="phase-title">UI, APIs & Navigation</h3>
+        <p class="phase-desc">Navigation, ListView/GridView, REST APIs, JSON parsing, async/await, animations, form validation, Provider state management, multi-screen apps.</p>
+        <div class="phase-tags">
+          <span class="tag">REST APIs</span>
+          <span class="tag">Navigation</span>
+          <span class="tag">Provider</span>
+          <span class="tag">Animations</span>
+          <span class="tag">FutureBuilder</span>
+        </div>
+      </div>
+      <div class="phase-card p3">
+        <div class="phase-num">Phase 3 · Mar 2026</div>
+        <h3 class="phase-title">Firebase & Backend</h3>
+        <p class="phase-desc">Firebase Auth, Cloud Firestore CRUD, real-time streams, Firebase Storage, Supabase integration, SQL vs NoSQL, file management, storage policies.</p>
+        <div class="phase-tags">
+          <span class="tag">Firebase</span>
+          <span class="tag">Firestore</span>
+          <span class="tag">Supabase</span>
+          <span class="tag">Authentication</span>
+          <span class="tag">CRUD</span>
+        </div>
+      </div>
+      <div class="phase-card pa">
+        <div class="phase-num">Advanced · Apr 2026</div>
+        <h3 class="phase-title">O'Reilly Course & Projects</h3>
+        <p class="phase-desc">Complete O'Reilly Flutter course (12 chapters), Expense Tracker, Quiz App, Chat App, Meal App, Riverpod, SQLite, Google Maps integration.</p>
+        <div class="phase-tags">
+          <span class="tag">Riverpod</span>
+          <span class="tag">SQLite</span>
+          <span class="tag">Google Maps</span>
+          <span class="tag">DevTools</span>
+          <span class="tag">Real-time Chat</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="skills-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">03 — Technical Stack</span>
+      <h2 class="section-title">Skills Acquired</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-item">
+        <div class="skill-icon">🎯</div>
+        <div class="skill-name">Flutter</div>
+        <div class="skill-level"><div class="skill-fill" style="width:92%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🎪</div>
+        <div class="skill-name">Dart</div>
+        <div class="skill-level"><div class="skill-fill" style="width:88%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🔥</div>
+        <div class="skill-name">Firebase</div>
+        <div class="skill-level"><div class="skill-fill" style="width:80%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🟢</div>
+        <div class="skill-name">Supabase</div>
+        <div class="skill-level"><div class="skill-fill" style="width:70%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">📦</div>
+        <div class="skill-name">State Management</div>
+        <div class="skill-level"><div class="skill-fill" style="width:78%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🌐</div>
+        <div class="skill-name">REST APIs</div>
+        <div class="skill-level"><div class="skill-fill" style="width:82%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🗄️</div>
+        <div class="skill-name">SQLite</div>
+        <div class="skill-level"><div class="skill-fill" style="width:65%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🐙</div>
+        <div class="skill-name">Git & GitHub</div>
+        <div class="skill-level"><div class="skill-fill" style="width:75%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🤖</div>
+        <div class="skill-name">Android Studio</div>
+        <div class="skill-level"><div class="skill-fill" style="width:80%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🗺️</div>
+        <div class="skill-name">Google Maps API</div>
+        <div class="skill-level"><div class="skill-fill" style="width:60%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🎞️</div>
+        <div class="skill-name">Animations</div>
+        <div class="skill-level"><div class="skill-fill" style="width:72%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">🔍</div>
+        <div class="skill-name">Debugging & DevTools</div>
+        <div class="skill-level"><div class="skill-fill" style="width:76%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="projects-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">04 — Built Projects</span>
+      <h2 class="section-title">Applications Developed</h2>
+    </div>
+    <div class="projects-grid">
+      <div class="project-card">
+        <div class="project-type">Mini App · Phase 1</div>
+        <div class="project-name">My Digital Card</div>
+        <p class="project-desc">Personal info card with structured widget layout using Text, Container, Row, Column, and Image.</p>
+        <div class="project-features"><span class="feature-tag">StatelessWidget</span><span class="feature-tag">Layout</span><span class="feature-tag">Styling</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Mini App · Phase 1</div>
+        <div class="project-name">Quote of the Day</div>
+        <p class="project-desc">5-quote cycling app with "Next Quote" button and looping state management.</p>
+        <div class="project-features"><span class="feature-tag">StatefulWidget</span><span class="feature-tag">Lists</span><span class="feature-tag">setState</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Multi-screen · Phase 2</div>
+        <div class="project-name">Contact Manager</div>
+        <p class="project-desc">Two-screen app with ListView, AlertDialog, FloatingActionButton, SnackBar, and Navigator navigation.</p>
+        <div class="project-features"><span class="feature-tag">Navigation</span><span class="feature-tag">ListView</span><span class="feature-tag">Dialog</span><span class="feature-tag">SnackBar</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Multi-screen · Phase 2</div>
+        <div class="project-name">Photo Gallery</div>
+        <p class="project-desc">GridView with Stack overlay, Modal BottomSheet (View/Share/Delete), and full-screen navigation.</p>
+        <div class="project-features"><span class="feature-tag">GridView</span><span class="feature-tag">Stack</span><span class="feature-tag">BottomSheet</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Backend · Phase 3</div>
+        <div class="project-name">Student List (Firebase)</div>
+        <p class="project-desc">Full Firestore CRUD with StreamBuilder, search, grade filtering via ChoiceChips, age-range RangeSlider, and pagination.</p>
+        <div class="project-features"><span class="feature-tag">Firestore</span><span class="feature-tag">StreamBuilder</span><span class="feature-tag">Search</span><span class="feature-tag">Filter</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Backend · Phase 3</div>
+        <div class="project-name">Employee Manager</div>
+        <p class="project-desc">Firestore CRUD with ChoiceChip filtering, name/email search, salary summary bar, and form validation.</p>
+        <div class="project-features"><span class="feature-tag">Firebase</span><span class="feature-tag">Model Class</span><span class="feature-tag">Analytics</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Storage · Phase 3</div>
+        <div class="project-name">Supabase File Manager</div>
+        <p class="project-desc">Upload/preview/delete images, PDFs, and videos with file metadata, storage policies, and modern UI cards.</p>
+        <div class="project-features"><span class="feature-tag">Supabase</span><span class="feature-tag">image_picker</span><span class="feature-tag">file_picker</span><span class="feature-tag">url_launcher</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Course · April</div>
+        <div class="project-name">Expense Tracker</div>
+        <p class="project-desc">Dynamic chart, modal forms, swipe-to-delete with undo, light/dark themes, and responsive layouts.</p>
+        <div class="project-features"><span class="feature-tag">Charts</span><span class="feature-tag">Themes</span><span class="feature-tag">Dismissible</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Course · April</div>
+        <div class="project-name">Meal App</div>
+        <p class="project-desc">GridView categories, tab/drawer navigation, Riverpod state management, and explicit animations.</p>
+        <div class="project-features"><span class="feature-tag">Riverpod</span><span class="feature-tag">Navigation</span><span class="feature-tag">Animations</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Course · April</div>
+        <div class="project-name">Favourite Places</div>
+        <p class="project-desc">SQLite persistence, GPS location, Google Maps, camera integration, Geocoding API, and Riverpod.</p>
+        <div class="project-features"><span class="feature-tag">SQLite</span><span class="feature-tag">GPS</span><span class="feature-tag">Google Maps</span><span class="feature-tag">Camera</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Course · April</div>
+        <div class="project-name">Real-time Chat App</div>
+        <p class="project-desc">Firebase Auth + Firestore streaming, grouped messages, push notifications, auto-generated avatars.</p>
+        <div class="project-features"><span class="feature-tag">Firebase Auth</span><span class="feature-tag">StreamBuilder</span><span class="feature-tag">FCM</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-type">Self-Project · March</div>
+        <div class="project-name">Decision Maker App</div>
+        <p class="project-desc">Spin-the-choice app that randomly selects from a predefined option list — creative independent project.</p>
+        <div class="project-features"><span class="feature-tag">Random Logic</span><span class="feature-tag">StatefulWidget</span><span class="feature-tag">Custom UI</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section id="achievements" class="achievements-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">05 — Achievements</span>
+      <h2 class="section-title">Quiz Performance</h2>
+    </div>
+    <div class="achieve-grid">
+      <div class="achieve-card">
+        <div class="achieve-badge bronze">🥉</div>
+        <div class="achieve-text">
+          <h3>Quiz 1 — 3rd Place</h3>
+          <p>Interactive quiz on Dart & Flutter fundamentals covering widgets, OOP, and development tools. 13 Feb 2026.</p>
+        </div>
+      </div>
+      <div class="achieve-card">
+        <div class="achieve-badge silver">🥈</div>
+        <div class="achieve-text">
+          <h3>Quiz 2 — 2nd Place · 27/30</h3>
+          <p>Phase 2 online quiz (30 questions, 30 sec each) covering navigation, ListView, GridView, forms, Provider, and REST APIs. 26 Feb 2026.</p>
+        </div>
+      </div>
+      <div class="achieve-card">
+        <div class="achieve-badge bronze">🥉</div>
+        <div class="achieve-text">
+          <h3>Quiz 3 — 3rd Place</h3>
+          <p>REST API, JSON parsing & FutureBuilder quiz. Plus a surprise Splash Screen quiz — 3rd in both. 27 Feb 2026.</p>
+        </div>
+      </div>
+      <div class="achieve-card">
+        <div class="achieve-badge gold">🥇</div>
+        <div class="achieve-text">
+          <h3>Phase 3 Quiz — 1st Place · 33/40</h3>
+          <p>Firebase & backend concepts: Firestore, RTDB, CRUD, NoSQL, JSON structures. 40 questions, ~15 sec each. 11 Mar 2026.</p>
+        </div>
+      </div>
+      <div class="achieve-card">
+        <div class="achieve-badge gold">🥇</div>
+        <div class="achieve-text">
+          <h3>Surprise Quiz — 1st Place · 34/40</h3>
+          <p>Firebase plans (Spark vs Blaze), CLI, billing, Firestore data handling. Bonus for quick responses. 17 Mar 2026.</p>
+        </div>
+      </div>
+      <div class="achieve-card">
+        <div class="achieve-badge gold">🎓</div>
+        <div class="achieve-text">
+          <h3>Phase 1 Review — Presented</h3>
+          <p>Presented Flutter, Firebase & Supabase work to college internship guide & coordinator. Demonstrated all major apps. 13 Apr 2026.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline" class="timeline-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">06 — Daily Log</span>
+      <h2 class="section-title">Internship Journal</h2>
+    </div>
+
+    <!-- PHASE 1 -->
+    <div class="phase-block">
+      <div class="phase-header">
+        <div class="phase-dot p1"></div>
+        <span class="phase-label p1">Phase 1 — February 2026 (Weeks 1–2)</span>
+      </div>
+      <div class="timeline-entries">
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">02 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Flutter</span></div>
+          </div>
+          <p class="entry-summary">Internship orientation: Flutter & Dart introduction, organization overview, cross-platform development concepts, UI/UX principles, and development workflow planning.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Understood Flutter/Dart fundamentals, cross-platform advantages, widget-based architecture, and internship roadmap. Introduced to UI/UX principles and professional mobile app development practices.</div>
+        </div>
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">03 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Flutter</span><span class="tag">Dart</span></div>
+          </div>
+          <p class="entry-summary">Flutter SDK setup, IDE configuration, emulator setup. Dart basics: syntax, data types, variables, functions, control statements. Flutter project structure, main function, and widget introduction.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Strong foundation in Dart programming. Understood project structure (main.dart), widget-based architecture, and differences between Stateless and Stateful widgets.</div>
+        </div>
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">04 Feb 2026</span><span class="entry-hrs">5 hrs</span>
+            <div class="entry-skills"><span class="tag">Flutter</span><span class="tag">React Native</span></div>
+          </div>
+          <p class="entry-summary">Flutter origin and relevance. Comparative study: Flutter vs native Android (Kotlin) vs React Native — performance, hot reload, code reusability, and industry adoption.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Clear understanding of Flutter's competitive advantages in the industry. Learned UI widget basics and how cross-platform development reduces cost and time.</div>
+        </div>
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">05 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Flutter</span><span class="tag">Git</span><span class="tag">Android Studio</span></div>
+          </div>
+          <p class="entry-summary">Android emulator configuration (Pixel 6, Pixel 9 Pro). API introduction and JSON data format. First sample Flutter app run. Git & version control: repos, commits, push. VS Code vs Android Studio roles.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Confident with emulator setup, API concepts, complete Flutter run workflow, and Git basics. Understood dev tool separation.</div>
+        </div>
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">06–08 Feb 2026</span><span class="entry-hrs">16 hrs</span>
+            <div class="entry-skills"><span class="tag">Dart</span></div>
+          </div>
+          <p class="entry-summary">Deep dive into Dart: 7 core data types (int, double, String, bool, List, Map, Set), var/dynamic/final/const differences. Weekend practice assignments. Operators, control flow (if-else, switch, loops), ternary operator.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Strong Dart foundation. Resolved confusion between var/dynamic through practice. Solid understanding of immutability, type safety, and collection handling.</div>
+          <div class="entry-blocker">⚠ Minor confusion distinguishing var vs dynamic — resolved through repeated practice and documentation reference.</div>
+        </div>
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">09–10 Feb 2026</span><span class="entry-hrs">12 hrs</span>
+            <div class="entry-skills"><span class="tag">Dart</span><span class="tag">Functions</span></div>
+          </div>
+          <p class="entry-summary">Dart functions deep dive: named, anonymous, arrow, recursive, higher-order functions. Positional vs named parameters, optional params, default values. Hands-on coding exercises.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Clear mastery of all Dart function types. Improved code structuring skills and logical thinking through intensive practice problems.</div>
+        </div>
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">11 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">OOP</span><span class="tag">Dart</span></div>
+          </div>
+          <p class="entry-summary">OOP in Dart: classes, objects, default/parameterized constructors. Encapsulation, inheritance, polymorphism, abstraction. Interfaces via implements. this and super keywords.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Solid OOP fundamentals. Understood how these principles support modular, reusable code in Flutter development.</div>
+        </div>
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">12 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Flutter</span><span class="tag">State</span></div>
+          </div>
+          <p class="entry-summary">Stateless vs Stateful widgets. Hello World app on emulator. Built counter app with increment/decrement. setState() triggering UI rebuilds.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Practical experience with state changes and UI rendering. Initially confused about setState() — resolved through guided practice.</div>
+          <div class="entry-blocker">⚠ Minor confusion on how setState() updates UI with Stateful widgets. Resolved through session guidance.</div>
+        </div>
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">13 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Flutter</span></div>
+          </div>
+          <p class="entry-summary">Interactive quiz recap session covering all Phase 1 topics. Competitive format with scoring. Secured 3rd place.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Reinforced theoretical knowledge. Improved confidence in quick recall. Identified areas for revision.</div>
+        </div>
+        <div class="entry ep1" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">14–15 Feb 2026</span><span class="entry-hrs">11 hrs</span>
+            <div class="entry-skills"><span class="tag">Flutter</span><span class="tag">Android Studio</span></div>
+          </div>
+          <p class="entry-summary">Built My Digital Card app (Text, Container, Row, Column, Image). Built Click Counter game with Stateful widgets. Quote of the Day app — list cycling with looping index logic.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Strengthened widget layout, state management, and dynamic content. Tested all apps on emulator. Resolved alignment and looping logic issues independently.</div>
+          <div class="entry-blocker">⚠ Alignment issues in Digital Card layout. Looping index logic required debugging — resolved through state revision.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase-block">
+      <div class="phase-header">
+        <div class="phase-dot p2"></div>
+        <span class="phase-label p2">Phase 2 — February–March 2026 (Weeks 3–4)</span>
+      </div>
+      <div class="timeline-entries">
+        <div class="entry ep2" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">17 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">TextField</span><span class="tag">Flutter</span></div>
+          </div>
+          <p class="entry-summary">TextField widgets: labels, hints, borders, alignment. Password fields with obscured text. Username/password system with Stateful widget handling.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Learned input styling, secure fields, and user input handling via Stateful widgets. Built a clean login-style interface.</div>
+        </div>
+        <div class="entry ep2" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">18 Feb 2026</span><span class="entry-hrs">5 hrs</span>
+            <div class="entry-skills"><span class="tag">Navigation</span><span class="tag">Flutter</span></div>
+          </div>
+          <p class="entry-summary">Navigation with push/pop. Dialog, AlertDialog, SnackBar, BottomSheet, Toast. Live task: integrate features in login app with constraints.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Understood navigation stack management and UI feedback components. Live task improved speed and confidence in real-time implementation.</div>
+        </div>
+        <div class="entry ep2" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">19 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">ListView</span><span class="tag">GridView</span><span class="tag">Stack</span></div>
+          </div>
+          <p class="entry-summary">ListView basics and dynamic builder. GridView for image galleries. Assets folder + pubspec.yaml image loading. Stack widget for layered designs. physics property for scroll control.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Mastered scrollable layouts. Integrated GridView gallery in login app. Understood Stack layering and scroll physics.</div>
+          <div class="entry-blocker">⚠ pubspec.yaml asset path configuration and Stack alignment required practice. Resolved through debugging.</div>
+        </div>
+        <div class="entry ep2" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">20 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Provider</span><span class="tag">State</span></div>
+          </div>
+          <p class="entry-summary">Inherited Widgets and Provider state management. Limitations of basic state vs structured Provider. Implementation in login app with shared state across screens.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Understood how Provider improves scalability, code cleanliness, and state propagation across widgets.</div>
+        </div>
+        <div class="entry ep2" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">21–23 Feb 2026</span><span class="entry-hrs">18 hrs</span>
+            <div class="entry-skills"><span class="tag">Navigator</span><span class="tag">ListView</span><span class="tag">GridView</span><span class="tag">Stack</span></div>
+          </div>
+          <p class="entry-summary">Contact Manager app: ListView, ListTile, AlertDialog, SnackBar, FloatingActionButton, Navigator.push/pop. Photo Gallery app: GridView.count, Stack+Positioned text, Modal BottomSheet, full-screen navigation. UI refinement & code restructuring.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Strong hands-on multi-screen app experience. Connected Flutter concepts into functional mini-applications. Improved code quality, naming conventions, and widget separation.</div>
+          <div class="entry-blocker">⚠ Data passing between screens and BottomSheet interactions required careful debugging. Resolved through testing and logic revision.</div>
+        </div>
+        <div class="entry ep2" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">24 Feb 2026</span><span class="entry-hrs">7 hrs</span>
+            <div class="entry-skills"><span class="tag">REST API</span><span class="tag">JSON</span><span class="tag">Async</span></div>
+          </div>
+          <p class="entry-summary">Networking fundamentals: URL structure, GET/POST/PUT/DELETE, HTTP status codes. http package, JSON parsing, Future/async/await, FutureBuilder. Integrated joke and user profile APIs into login app.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Strong understanding of REST APIs, async programming, JSON handling, and displaying dynamic data via FutureBuilder.</div>
+          <div class="entry-blocker">⚠ Async flow with FutureBuilder and JSON parsing required step-by-step examples to fully grasp.</div>
+        </div>
+        <div class="entry ep2" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">25 Feb 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Form Validation</span><span class="tag">Animations</span><span class="tag">Lottie</span></div>
+          </div>
+          <p class="entry-summary">Form validation: Form widget, GlobalKey, TextFormField, validators. Flutter animations: Fade, Scale, Slide. Lottie animation integration in login app.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Practical understanding of form validation and animations. Learned pubspec.yaml dependency management for third-party packages.</div>
+        </div>
+        <div class="entry ep2" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">26–27 Feb 2026</span><span class="entry-hrs">10 hrs</span>
+            <div class="entry-skills"><span class="tag">Phase 2 Recap</span><span class="tag">Quizzes</span></div>
+          </div>
+          <p class="entry-summary">Comprehensive Phase 2 recap. Quiz 2 (30q, 30sec each) — 2nd place, 27/30. Quiz 3 on REST API/FutureBuilder + surprise Splash Screen quiz — 3rd in both. Weekend assignments provided.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Improved quiz performance from 3rd to 2nd. Strong conceptual recall under time pressure. Decision Maker app built as free-choice assignment.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase-block">
+      <div class="phase-header">
+        <div class="phase-dot p3"></div>
+        <span class="phase-label p3">Phase 3 — March 2026 (Firebase & Backend)</span>
+      </div>
+      <div class="timeline-entries">
+        <div class="entry ep3" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">02 Mar 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Firebase</span><span class="tag">NoSQL</span></div>
+          </div>
+          <p class="entry-summary">Firebase as a BaaS platform. Services: authentication, analytics, storage, hosting, notifications, serverless. SQL vs NoSQL. Realtime Database vs Cloud Firestore. Firestore queries: filter, sort, paginate.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Strong conceptual Firebase foundation. Understood NoSQL document models and efficient Firestore query strategies.</div>
+        </div>
+        <div class="entry ep3" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">03–05 Mar 2026</span><span class="entry-hrs">17 hrs</span>
+            <div class="entry-skills"><span class="tag">Firebase</span><span class="tag">Firestore</span><span class="tag">Auth</span></div>
+          </div>
+          <p class="entry-summary">Firebase project setup: gradle.kts files, google-services.json, pubspec.yaml dependencies. CRUD theory. Authentication + Firestore register/login flow with user credential storage. Practical implementation in login app.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">End-to-end Firebase setup knowledge. Registration/login system working. Understand how Auth and Firestore work together in real apps.</div>
+          <div class="entry-blocker">⚠ Gradle configuration required careful attention — incorrect google-services.json placement caused build errors.</div>
+        </div>
+        <div class="entry ep3" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">06 Mar 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Firestore CRUD</span><span class="tag">StreamBuilder</span></div>
+          </div>
+          <p class="entry-summary">Student List feature: add/edit/delete with Firestore StreamBuilder, real-time ListView, modal bottom sheets. Dynamic CRUD with modern icon UI.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Hands-on Firestore CRUD in production-style UI. Learned how frontend UI combines with backend data management.</div>
+        </div>
+        <div class="entry ep3" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">09–13 Mar 2026</span><span class="entry-hrs">29 hrs</span>
+            <div class="entry-skills"><span class="tag">Firestore</span><span class="tag">Search</span><span class="tag">Filter</span><span class="tag">Index</span></div>
+          </div>
+          <p class="entry-summary">factory constructors for JSON-to-Dart mapping, private classes, StreamBuilder updates. Search with _searchQuery filtering. Grade ChoiceChips with Firestore where/orderBy. Firebase indexing. Advanced filters: RangeSlider, sorting toggle, "Show More" pagination. Phase 3 quiz — 1st place, 33/40.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Deep Firestore query mastery. Understood combined filters, sorting, and limit-based pagination. First place in Phase 3 assessment.</div>
+        </div>
+        <div class="entry ep3" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">14–15 Mar 2026</span><span class="entry-hrs">11 hrs</span>
+            <div class="entry-skills"><span class="tag">Firebase</span><span class="tag">Employee App</span></div>
+          </div>
+          <p class="entry-summary">Employee Management app: model class with toMap/fromFirestore, EmployeeService CRUD class, ChoiceChip filtering, name/email search, salary summary bar, form validation.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Built production-level data-driven Flutter app. Connected dynamic summaries with Firestore real-time streams.</div>
+        </div>
+        <div class="entry ep3" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">17–19 Mar 2026</span><span class="entry-hrs">16 hrs</span>
+            <div class="entry-skills"><span class="tag">Firebase</span><span class="tag">Billing</span><span class="tag">CLI</span></div>
+          </div>
+          <p class="entry-summary">Spark vs Blaze plan comparison: pay-as-you-go billing, budget alerts, Firebase CLI integration. Surprise quiz — 1st place, 34/40. Firebase Storage concepts: putFile, getDownloadURL, delete, metadata. image_picker, file_picker, cached_network_image packages.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Understood Firebase cost management, CLI setup, and file storage operations. Media handling with performance-optimized caching.</div>
+        </div>
+        <div class="entry ep3" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">20–27 Mar 2026</span><span class="entry-hrs">47 hrs</span>
+            <div class="entry-skills"><span class="tag">Supabase</span><span class="tag">SQL</span><span class="tag">File Manager</span></div>
+          </div>
+          <p class="entry-summary">Supabase as Firebase alternative (SQL-based). Storage buckets, anon key setup, pubspec.yaml config. File Manager UI: upload/display/open/delete for images, PDFs, videos. Storage policies for read/insert permissions. Fixed emulator compatibility (Pixel 6a, Android 13). Modern UI with file metadata cards and delete confirmation dialog.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Comprehensive Supabase knowledge from setup to production file management. Understood SQL vs NoSQL differences in practice.</div>
+          <div class="entry-blocker">⚠ Storage policies misconfiguration blocked uploads initially. Pixel 6 emulator incompatibility resolved by switching to Pixel 6a with Android 13.</div>
+        </div>
+        <div class="entry ep3" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">29–31 Mar 2026</span><span class="entry-hrs">15 hrs</span>
+            <div class="entry-skills"><span class="tag">Revision</span><span class="tag">Play Store</span></div>
+          </div>
+          <p class="entry-summary">Complete Phase 1–3 revision. Play Store deployment: debug vs release builds, app signing, version updates. image_picker + Supabase storage policy fixes. Learning phase concluded — project phase announced.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Ready for project phase. Understand full app lifecycle from development to deployment. All CRUD and storage features working.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APRIL -->
+    <div class="phase-block">
+      <div class="phase-header">
+        <div class="phase-dot pa"></div>
+        <span class="phase-label pa">April 2026 — O'Reilly Course & Reviews</span>
+      </div>
+      <div class="timeline-entries">
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">01–02 Apr 2026</span><span class="entry-hrs">10 hrs</span>
+            <div class="entry-skills"><span class="tag">Project Phase</span></div>
+          </div>
+          <p class="entry-summary">Team formation discussions (4-member teams). Project ideation: smart retail, bus tracking, learning platforms, freelance marketplaces, alumni networks, smart city reporting. Chief Director address on performance and discipline.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Clear understanding of project phase structure. Improved communication via leadership interaction. Broadened thinking on problem-solving through technology.</div>
+        </div>
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">03–07 Apr 2026</span><span class="entry-hrs">28 hrs</span>
+            <div class="entry-skills"><span class="tag">O'Reilly</span><span class="tag">Supabase</span><span class="tag">Flutter</span></div>
+          </div>
+          <p class="entry-summary">Shop Product Page assignment (Supabase storage with images/PDFs/videos). O'Reilly Chapters 1–3: cross-platform overview, project structure, hot reload, widgets. Chapter 2 assignment: Dice Game app using Random function and asset images.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Real-world file management implementation. Strong foundation refreshed through structured course. Dice game built with proper StatefulWidget and const optimization.</div>
+        </div>
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">07 Apr 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Quiz App</span><span class="tag">Google Fonts</span></div>
+          </div>
+          <p class="entry-summary">Chapter 3: Quiz Application — app logo, question data structures, answer shuffling, Google Fonts integration, overflow handling, result tracking, and smooth navigation between questions.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Built structured app with dynamic content, multiple screens, external fonts, and user flow management.</div>
+        </div>
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">08 Apr 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">DevTools</span><span class="tag">Debugging</span></div>
+          </div>
+          <p class="entry-summary">Chapter 4: Flutter debugging — debug mode, start/restart options, debug console. Flutter DevTools: profiling, performance analysis, logs, widget inspection, real-time state tracking.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Professional debugging workflows. Understood DevTools profiling and performance optimization for complex widget trees.</div>
+        </div>
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">09 Apr 2026</span><span class="entry-hrs">7 hrs</span>
+            <div class="entry-skills"><span class="tag">Expense Tracker</span><span class="tag">Charts</span><span class="tag">Themes</span></div>
+          </div>
+          <p class="entry-summary">Chapters 5–6: Expense Tracker with Dart enums, Material Design, light/dark themes, modal bottom sheets, form validation, dynamic category charts, swipe-to-delete with undo SnackBar.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Complete app with structured data models, interactive charts, multiple themes, and modern UX patterns.</div>
+        </div>
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">10 Apr 2026</span><span class="entry-hrs">9 hrs</span>
+            <div class="entry-skills"><span class="tag">Riverpod</span><span class="tag">Meal App</span><span class="tag">Todo App</span></div>
+          </div>
+          <p class="entry-summary">Chapter 7: Todo App — Widget/Element/Render Tree internals, mutable state, task sorting, priority indicators. Chapters 8–10: Meal App — GridView, InkWell, tab navigation, side drawer, Riverpod state management (providers + notifier), explicit vs implicit animations.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Deep Flutter internals knowledge. Riverpod mastery for scalable state management. Multi-navigation pattern expertise.</div>
+          <div class="entry-blocker">⚠ Element Tree/Render Tree concepts required deeper conceptual study. Riverpod implementation took practice to master.</div>
+        </div>
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">11 Apr 2026</span><span class="entry-hrs">10 hrs</span>
+            <div class="entry-skills"><span class="tag">SQLite</span><span class="tag">GPS</span><span class="tag">Google Maps</span><span class="tag">Firebase REST</span></div>
+          </div>
+          <p class="entry-summary">Chapters 11–12: Shopping List — Firebase RTDB REST API (GET/POST/DELETE), FutureBuilder, optimistic UI updates, Dismissible swipe-to-delete. Chapter 13: Favourite Places — SQLite persistence, Riverpod, image_picker, GPS, Google Maps, Geocoding API, full-screen map views.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Production-style apps combining local and cloud storage, device hardware (camera/GPS), and external APIs. Deep async and architecture mastery.</div>
+          <div class="entry-blocker">⚠ REST data flow + JSON mapping to models was challenging. SQLite + camera + GPS together required careful async handling.</div>
+        </div>
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">12 Apr 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Real-time Chat</span><span class="tag">Firebase Auth</span><span class="tag">FCM</span></div>
+          </div>
+          <p class="entry-summary">Final Chapter: Real-time Chat App — Firebase Auth (login/signup on single screen), Firestore streaming with StreamBuilder, grouped messages by timestamp, avatar via ui-avatars.com, Firebase Cloud Messaging push notifications.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Built a production-style real-time chat with clean architecture, Firestore as single source of truth, and push notification exploration.</div>
+          <div class="entry-blocker">⚠ Firebase Storage billing requirement (Blaze plan) limited push notification full implementation — exploring alternative approaches.</div>
+        </div>
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">13 Apr 2026</span><span class="entry-hrs">6 hrs</span>
+            <div class="entry-skills"><span class="tag">Presentation</span></div>
+          </div>
+          <p class="entry-summary">Internship Review Phase 1: PowerPoint presentation to college guide, coordinator, and committee. Covered learning journey, mini projects, Firebase/Supabase apps, quiz achievements, and future goals.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Improved professional presentation and communication skills. Successfully demonstrated all major applications and summarized internship progress.</div>
+        </div>
+        <div class="entry epa" onclick="toggleEntry(this)">
+          <div class="entry-header">
+            <span class="entry-date">14–15 Apr 2026</span><span class="entry-hrs">10 hrs</span>
+            <div class="entry-skills"><span class="tag">Interview</span><span class="tag">Open Source</span><span class="tag">Play Store</span></div>
+          </div>
+          <p class="entry-summary">Surprise interview-style assessment: technical knowledge, work ethics, deliverables, learning adaptability. Performed confidently. Explored Play Store deployment, GSoC project ideas, applied for GSSoC open-source program.</p>
+          <div class="entry-toggle">View Outcomes</div>
+          <div class="entry-outcome">Strong interview performance. Gained awareness of app deployment lifecycle and open-source contribution pathways for continued Flutter growth.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-name">Manjunath V Poojari</div>
+  <p>VTU Internship 2026 · Flutter Mobile Development</p>
+  <p style="margin-top:.5rem;font-size:.75rem;">Feb 2026 – Apr 2026 · 73 Days · 390+ Hours</p>
+  <div class="footer-links">
+    <a href="https://github.com/manjunathvpoojari" target="_blank">GitHub ↗</a>
+    <a href="https://manjunathvpoojari.github.io/Portfolio/" target="_blank">Portfolio ↗</a>
+  </div>
+</footer>
+
+<script>
+  function toggleEntry(el) {
+    el.classList.toggle('open');
+  }
+
+  // Animate skill bars on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.skill-fill').forEach(bar => {
+          const w = bar.style.width;
+          bar.style.width = '0';
+          setTimeout(() => bar.style.width = w, 100);
+        });
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  document.querySelectorAll('.skills-grid').forEach(g => observer.observe(g));
+
+  // Smooth active nav
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 200) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--text)' : '';
+    });
+  });
+</script>
+</body>
+</html>
