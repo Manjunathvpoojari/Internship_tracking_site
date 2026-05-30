@@ -1,0 +1,12 @@
+# ── required ──────────────────────────────
+flask
+
+# ── recommended (install these too) ───────
+
+# Replaces the "development server" warning when you want to share
+# the app on your local network (e.g. open it on your phone)
+waitress
+
+# Lets you put config like PORT=5050 in a .env file
+# instead of hardcoding it in app.py
+python-dotenv

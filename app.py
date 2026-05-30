@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, send_from_directory
-import sqlite3, os, json
+import sqlite3, os
 from datetime import datetime
 
 app = Flask(__name__, static_folder='public', static_url_path='')
@@ -107,7 +107,7 @@ def get_stats():
     conn = get_db()
     total_entries = conn.execute('SELECT COUNT(*) as c FROM entries').fetchone()['c']
     total_hours   = conn.execute('SELECT SUM(hours) as h FROM entries').fetchone()['h'] or 0
-    by_phase      = conn.execute('SELECT phase, COUNT(*) as c, SUM(hours) as h FROM entries GROUP BY phase').fetchall()
+    by_phase      = conn.execute('SELECT phase, COUNT(*) as c, SUM(hours) as h FROM entries GROUP BY phase ORDER BY MIN(date)').fetchall()
     conn.close()
     return jsonify({
         'total_entries': total_entries,
@@ -127,11 +127,13 @@ def admin():
 
 if __name__ == '__main__':
     init_db()
-    # seed if empty
     conn = get_db()
     count = conn.execute('SELECT COUNT(*) as c FROM entries').fetchone()['c']
     conn.close()
     if count == 0:
         import seed
         seed.run()
+    print("\n✅ Server running!")
+    print("   Public view  →  http://localhost:5050")
+    print("   Admin panel  →  http://localhost:5050/admin\n")
     app.run(debug=True, port=5050)

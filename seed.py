@@ -518,6 +518,15 @@ ENTRIES = [
         "skills": "Flutter, Android Studio, Git",
         "blockers": "Faced some difficulty while understanding advanced Flutter concepts independently and identifying the right open-source projects to start with. Also needed time to explore contribution processes and expectations. These challenges were managed through research, self-learning, and continuous practice."
     },
+    # ── MAY ──
+    # Add your May 2026 entries below. Example structure shown:
+    # {
+    #     "date": "2026-05-01", "hours": 5, "phase": "May",
+    #     "work_summary": "...",
+    #     "learning_outcome": "...",
+    #     "skills": "Flutter, Android Studio",
+    #     "blockers": "No Blockers."
+    # },
 ]
 
 def run():
